@@ -4,27 +4,27 @@ import { Badge, BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
-interface APIAlertProps {
+interface ApiAlertProps {
   title: string;
   description: string;
   variant: "public" | "admin";
 }
 
-const textMap: Record<APIAlertProps["variant"], string> = {
+const textMap: Record<ApiAlertProps["variant"], string> = {
   public: "Public",
   admin: "Admin",
 };
 
-const variantMap: Record<APIAlertProps["variant"], BadgeProps["variant"]> = {
+const variantMap: Record<ApiAlertProps["variant"], BadgeProps["variant"]> = {
   public: "secondary",
   admin: "destructive",
 };
 
-export const APIAlert = ({
+export const ApiAlert = ({
   title,
   description,
   variant = "public",
-}: APIAlertProps) => {
+}: ApiAlertProps) => {
   const onCopy = (description: string) => {
     navigator.clipboard.writeText(description);
     toast.success("API Route copied to clipboard.");
