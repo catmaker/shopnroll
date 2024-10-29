@@ -9,7 +9,6 @@ interface ApiListProps {
 }
 
 const ApiList = ({ entityName, entityIdName }: ApiListProps) => {
-  console.log(entityName, entityIdName);
   const origin = useOrigin();
   const params = useParams();
 

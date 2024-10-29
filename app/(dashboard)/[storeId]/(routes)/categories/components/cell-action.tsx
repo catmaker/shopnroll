@@ -31,7 +31,6 @@ const CellAction = ({ data }: CellActionProps) => {
     navigator.clipboard.writeText(id);
     toast.success("Category ID copied to clipboard.");
   };
-  console.log(data);
   const onDelete = async () => {
     try {
       setLoading(true);
