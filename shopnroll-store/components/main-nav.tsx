@@ -2,38 +2,62 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Category } from "@/lib/types";
+import { Category, SubCategory } from "@/lib/types";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 interface MainNavProps {
-  data: Category[];
+  categories: Category[];
+  subCategories: SubCategory[];
 }
 
-const MainNav = ({ data }: MainNavProps) => {
+const MainNav = ({ categories, subCategories }: MainNavProps) => {
   const pathname = usePathname();
 
-  const routes = data.map((route: any) => ({
+  const routes = categories.map((route) => ({
     href: `/category/${route.id}`,
     label: route.name,
+    id: route.id,
     active: pathname === `/category/${route.id}`,
   }));
 
   return (
-    <nav className="mx-6 flex items-center space-x-4 lg:space-x-6">
-      {routes.map((route: any) => (
-        <Link
-          key={route.href}
-          href={route.href}
-          className={cn(
-            "text-sm font-medium transition-colors hover:text-black",
-            route.active ? "text-black" : "text-neutral-500"
-          )}
-        >
-          {route.label}
-        </Link>
-      ))}
-    </nav>
+    <NavigationMenu className="w-max ml-4">
+      <NavigationMenuList>
+        {routes.map((route) => (
+          <NavigationMenuItem key={route.href}>
+            <NavigationMenuTrigger
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-black bg-transparent",
+                route.active ? "text-black" : "text-neutral-500"
+              )}
+            >
+              {route.label}
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="bg-transparent transition-all duration-50">
+              <ul className="grid w-max p-2 bg-transparent">
+                {subCategories
+                  .filter((sub) => sub.categoryId === route.id)
+                  .map((subCategory) => (
+                    <li
+                      key={subCategory.id}
+                      className="p-2 hover:bg-neutral-100 bg-transparent"
+                    >
+                      {subCategory.name}
+                    </li>
+                  ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        ))}
+      </NavigationMenuList>
+    </NavigationMenu>
   );
 };
 
