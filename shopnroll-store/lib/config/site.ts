@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const name = "ShopNRoll Store";
+const name = "StylePoint";
 const description =
   "Shop your favorite items with ShopNRoll - Your one-stop fashion destination";
 const url = "https://shopnroll.com";
