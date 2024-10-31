@@ -13,6 +13,7 @@ export async function POST(
       name,
       price,
       categoryId,
+      subCategoryId,
       colorId,
       sizeId,
       images,
@@ -68,6 +69,7 @@ export async function POST(
         name,
         price,
         categoryId,
+        subCategoryId,
         colorId,
         sizeId,
         images: {
@@ -117,6 +119,7 @@ export async function GET(
         category: true,
         color: true,
         size: true,
+        subCategory: true,
       },
       orderBy: {
         createdAt: "desc",
