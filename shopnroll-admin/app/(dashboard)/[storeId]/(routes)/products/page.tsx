@@ -12,6 +12,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
       category: true,
       size: true,
       color: true,
+      subCategory: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -26,6 +27,7 @@ const ProductsPage = async ({ params }: { params: { storeId: string } }) => {
     price: formatter.format(item.price.toNumber()),
     category: item.category.name,
     size: item.size.name,
+    subCategory: item.subCategory.name,
     color: item.color.name,
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
   }));

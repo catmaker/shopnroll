@@ -8,7 +8,7 @@ export async function POST(
   try {
     const { userId } = auth();
     const body = await req.json();
-
+    console.log(body);
     const {
       name,
       price,
@@ -17,6 +17,7 @@ export async function POST(
       colorId,
       sizeId,
       images,
+      description,
       isFeatured,
       isArchived,
     } = body;
@@ -72,6 +73,7 @@ export async function POST(
         subCategoryId,
         colorId,
         sizeId,
+        description: description || null,
         images: {
           createMany: {
             data: [...images.map((image: { url: string }) => image)],
@@ -85,9 +87,9 @@ export async function POST(
 
     return NextResponse.json(product);
   } catch (error) {
-    console.log("[PRODUCT_PATCH]", error);
+    console.log("[PRODUCT_POST]", error);
+    return new NextResponse(`Internal error: ${error}`, { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }
 
 export async function GET(

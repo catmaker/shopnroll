@@ -28,7 +28,7 @@ const MainNav = ({
     },
     {
       href: `/${params.storeId}/subcategories`,
-      label: "Sub Categories",
+      label: "SubCategories",
       active: pathname === `/${params.storeId}/subcategories`,
     },
     {

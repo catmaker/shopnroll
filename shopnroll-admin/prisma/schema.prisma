@@ -99,6 +99,7 @@ model Color {
 model Product {
   id        String   @id @default(uuid())
   name      String
+  description String?
   storeId   String
   price     Decimal
   store Store @relation("StoreProduct", fields: [storeId], references: [id])
@@ -116,7 +117,7 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   images Image[]
-  
+
   @@index([storeId])
   @@index([categoryId])
   @@index([sizeId])

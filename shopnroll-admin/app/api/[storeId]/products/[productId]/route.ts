@@ -45,6 +45,7 @@ export async function PATCH(
       colorId,
       sizeId,
       images,
+      description,
       isFeatured,
       isArchived,
     } = body;
@@ -102,6 +103,7 @@ export async function PATCH(
         categoryId,
         colorId,
         sizeId,
+        description,
         images: {
           deleteMany: {},
         },
@@ -126,8 +128,8 @@ export async function PATCH(
     return NextResponse.json(product);
   } catch (error) {
     console.log("[PRODUCT_PATCH]", error);
+    return new NextResponse(`Internal error: ${error}`, { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }
 
 export async function DELETE(
@@ -165,6 +167,6 @@ export async function DELETE(
     return NextResponse.json(product);
   } catch (error) {
     console.log("[PRODUCT_DELETE]", error);
+    return new NextResponse(`Internal error: ${error}`, { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }

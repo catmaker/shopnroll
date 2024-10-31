@@ -44,6 +44,7 @@ const formSchema = z.object({
   subCategoryId: z.string().min(1),
   colorId: z.string().min(1),
   sizeId: z.string().min(1),
+  description: z.string().optional().default(""),
   isFeatured: z.boolean().default(false),
   isArchived: z.boolean().default(false),
   images: z
@@ -90,6 +91,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       ? {
           ...initialData,
           price: parseFloat(String(initialData.price)),
+          description: initialData.description || undefined,
         }
       : {
           name: "",
@@ -99,6 +101,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           subCategoryId: "",
           colorId: "",
           sizeId: "",
+          description: "",
           isFeatured: false,
           isArchived: false,
         },
@@ -217,6 +220,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="price"
@@ -365,6 +369,24 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       ))}
                     </SelectContent>
                   </Select>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Product description"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
