@@ -24,6 +24,8 @@ export interface Product {
   category: Category;
   subCategory: SubCategory;
   isFeatured: boolean;
+  isArchived: boolean;
+  description?: string;
   size: Size;
   color: Color;
   images: Image[];
