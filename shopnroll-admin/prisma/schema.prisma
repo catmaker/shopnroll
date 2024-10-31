@@ -23,6 +23,7 @@ model Store {
   sizes      Size[]     @relation("StoreSize")
   products   Product[]  @relation("StoreProduct")
   orders     Order[]  @relation("StoreOrder")
+  subCategories SubCategory[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -45,12 +46,28 @@ model Category {
   store     Store    @relation("StoreCategory", fields: [storeId], references: [id])
   billboardId String
   billboard   Billboard @relation(fields: [billboardId], references: [id])
+  subCategories SubCategory[]
   products   Product[]  @relation("CategoryProduct")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([storeId])
   @@index([billboardId])
+}
+
+model SubCategory {
+  id        String   @id @default(uuid())
+  name      String
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+  products   Product[]  @relation("SubCategoryProduct")
+  storeId String
+  store Store @relation(fields: [storeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([storeId])
 }
 
 model Size {
@@ -92,16 +109,19 @@ model Product {
   colorId String
   color Color @relation("ProductColor", fields: [colorId], references: [id])
   orderItems OrderItem[]
+  subCategoryId String
+  subCategory SubCategory @relation("SubCategoryProduct", fields: [subCategoryId], references: [id])
   isFeatured Boolean @default(false) // 특별 상품 여부
   isArchived Boolean @default(false) // 품절 여부나 중단 여부
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   images Image[]
-
+  
   @@index([storeId])
   @@index([categoryId])
   @@index([sizeId])
   @@index([colorId])
+  @@index([subCategoryId])
 }
   
 model Image {
