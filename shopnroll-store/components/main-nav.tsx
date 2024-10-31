@@ -4,12 +4,11 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Category, SubCategory } from "@/lib/types";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuList,
-  NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
 interface MainNavProps {
@@ -31,29 +30,31 @@ const MainNav = ({ categories, subCategories }: MainNavProps) => {
     <NavigationMenu className="w-max ml-4">
       <NavigationMenuList>
         {routes.map((route) => (
-          <NavigationMenuItem key={route.href}>
-            <NavigationMenuTrigger
+          <NavigationMenuItem key={route.href} className="relative group/item">
+            <div
               className={cn(
-                "text-sm font-medium transition-colors hover:text-black bg-transparent",
+                "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:text-black bg-transparent",
                 route.active ? "text-black" : "text-neutral-500"
               )}
             >
               {route.label}
-            </NavigationMenuTrigger>
-            <NavigationMenuContent className="bg-transparent transition-all duration-50">
-              <ul className="grid w-max p-2 bg-transparent">
-                {subCategories
-                  .filter((sub) => sub.categoryId === route.id)
-                  .map((subCategory) => (
-                    <li
-                      key={subCategory.id}
-                      className="p-2 hover:bg-neutral-100 bg-transparent"
-                    >
-                      {subCategory.name}
-                    </li>
-                  ))}
-              </ul>
-            </NavigationMenuContent>
+              <ChevronDownIcon
+                className="relative top-[1px] ml-1 h-3 w-3 transition duration-300 group-hover/item:rotate-180"
+                aria-hidden="true"
+              />
+            </div>
+            <ul className="hidden group-hover/item:block absolute top-full left-0 w-max p-2 bg-white rounded-md shadow-md">
+              {subCategories
+                .filter((sub) => sub.categoryId === route.id)
+                .map((subCategory) => (
+                  <li
+                    key={subCategory.id}
+                    className="p-2 hover:bg-neutral-100 rounded-sm"
+                  >
+                    {subCategory.name}
+                  </li>
+                ))}
+            </ul>
           </NavigationMenuItem>
         ))}
       </NavigationMenuList>
