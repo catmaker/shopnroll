@@ -1,6 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Product, Image, Category, Size, Color } from "@prisma/client";
+import {
+  Product,
+  Image,
+  Category,
+  Size,
+  Color,
+  SubCategory,
+} from "@prisma/client";
 import Heading from "@/components/ui/heading";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +41,7 @@ const formSchema = z.object({
   name: z.string().min(1),
   price: z.coerce.number().min(1),
   categoryId: z.string().min(1),
+  subCategoryId: z.string().min(1),
   colorId: z.string().min(1),
   sizeId: z.string().min(1),
   isFeatured: z.boolean().default(false),
@@ -56,6 +64,7 @@ interface ProductFormProps {
   categories: Category[];
   sizes: Size[];
   colors: Color[];
+  subCategories: SubCategory[];
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
@@ -63,6 +72,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   categories,
   sizes,
   colors,
+  subCategories,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -86,16 +96,25 @@ const ProductForm: React.FC<ProductFormProps> = ({
           images: [],
           price: 0,
           categoryId: "",
+          subCategoryId: "",
           colorId: "",
           sizeId: "",
           isFeatured: false,
           isArchived: false,
         },
   });
+
+  const selectedCategoryId = form.watch("categoryId");
+
+  const filteredSubCategories = subCategories.filter(
+    (subCategory) => subCategory.categoryId === selectedCategoryId
+  );
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "images",
   });
+
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
@@ -116,6 +135,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setLoading(false);
     }
   };
+
   const onDelete = async () => {
     try {
       setLoading(true);
@@ -132,6 +152,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setOpen(false);
     }
   };
+
   return (
     <>
       <AlertModal
@@ -243,6 +264,43 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       ))}
                     </SelectContent>
                   </Select>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="subCategoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sub Category</FormLabel>
+                  <Select
+                    disabled={loading || !form.watch("categoryId")}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            filteredSubCategories.length > 0
+                              ? "Select a sub category"
+                              : "No sub categories found"
+                          }
+                          defaultValue={field.value}
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {filteredSubCategories.map((subCategory) => (
+                        <SelectItem key={subCategory.id} value={subCategory.id}>
+                          {subCategory.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
                 </FormItem>
               )}
             />
