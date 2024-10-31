@@ -10,11 +10,19 @@ export interface Category {
   billboard: Billboard;
 }
 
+export interface SubCategory {
+  id: string;
+  name: string;
+  categoryId: string;
+  category: Category;
+}
+
 export interface Product {
   id: string;
   name: string;
   price: string;
   category: Category;
+  subCategory: SubCategory;
   isFeatured: boolean;
   size: Size;
   color: Color;
@@ -37,3 +45,4 @@ export interface Color {
   name: string;
   value: string;
 }
+
