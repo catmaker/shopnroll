@@ -29,8 +29,21 @@ export interface Product {
   size: Size;
   color: Color;
   images: Image[];
+  productColors: ProductColor[];
+  productSizes: ProductSize[];
 }
-
+export interface ProductColor {
+  id: string;
+  productId: string;
+  colorId: string;
+  color: Color;
+}
+export interface ProductSize {
+  id: string;
+  productId: string;
+  sizeId: string;
+  size: Size;
+}
 export interface Image {
   id: string;
   url: string;
@@ -47,4 +60,3 @@ export interface Color {
   name: string;
   value: string;
 }
-

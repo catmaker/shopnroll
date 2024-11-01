@@ -20,15 +20,24 @@ export async function GET(
         category: true,
         color: true,
         size: true,
-        productColors: true,
+        productColors: {
+          include: {
+            color: true,
+          },
+        },
+        productSizes: {
+          include: {
+            size: true,
+          },
+        },
       },
     });
 
     return NextResponse.json(product);
   } catch (error) {
     console.log("[PRODUCT_GET]", error);
+    return NextResponse.json("Internal error", { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }
 
 export async function PATCH(
@@ -46,6 +55,7 @@ export async function PATCH(
       colorId,
       productColors,
       sizeId,
+      productSizes,
       images,
       description,
       isFeatured,
@@ -105,6 +115,9 @@ export async function PATCH(
         categoryId,
         colorId,
         sizeId,
+        productSizes: {
+          deleteMany: {},
+        },
         description,
         productColors: {
           deleteMany: {},
@@ -130,6 +143,11 @@ export async function PATCH(
         productColors: {
           createMany: {
             data: [...productColors.map((colorId: string) => ({ colorId }))],
+          },
+        },
+        productSizes: {
+          createMany: {
+            data: [...productSizes.map((sizeId: string) => ({ sizeId }))],
           },
         },
       },

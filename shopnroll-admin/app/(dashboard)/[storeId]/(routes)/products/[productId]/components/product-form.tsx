@@ -8,6 +8,7 @@ import {
   Color,
   SubCategory,
   ProductColor,
+  ProductSize,
 } from "@prisma/client";
 import Heading from "@/components/ui/heading";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ const formSchema = z.object({
   subCategoryId: z.string().min(1),
   colorId: z.string().min(1),
   productColors: z.array(z.string()).default([]),
+  productSizes: z.array(z.string()).default([]),
   sizeId: z.string().min(1),
   description: z.string().optional().default(""),
   isFeatured: z.boolean().default(false),
@@ -63,6 +65,7 @@ interface ProductFormProps {
     | (Product & {
         images: Image[];
         productColors: ProductColor[];
+        productSizes: ProductSize[];
       })
     | null;
   categories: Category[];
@@ -95,6 +98,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           price: parseFloat(String(initialData.price)),
           description: initialData.description || undefined,
           productColors: initialData.productColors?.map((pc) => pc.colorId),
+          productSizes: initialData.productSizes?.map((ps) => ps.sizeId),
         }
       : {
           name: "",
@@ -104,6 +108,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           subCategoryId: "",
           colorId: "",
           productColors: [],
+          productSizes: [],
           sizeId: "",
           description: "",
           isFeatured: false,
@@ -344,7 +349,41 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={form.control}
+              name="productSizes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Additional Sizes (Optional)</FormLabel>
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                    {sizes.map((size) => (
+                      <div
+                        key={size.id}
+                        onClick={() => {
+                          const values = new Set(field.value || []);
+                          if (values.has(size.id)) {
+                            values.delete(size.id);
+                          } else {
+                            values.add(size.id);
+                          }
+                          field.onChange(Array.from(values));
+                        }}
+                        className={`
+              flex items-center justify-center p-2 rounded-md cursor-pointer border
+              ${
+                field.value?.includes(size.id)
+                  ? "border-black"
+                  : "border-gray-200"
+              }
+            `}
+                      >
+                        <span className="text-center">{size.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="colorId"
@@ -383,9 +422,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               control={form.control}
               name="productColors"
               render={({ field }) => {
-                // 현재 선택된 색상들의 값을 확인
                 console.log("Selected colors:", field.value);
-                // 사용 가능한 전체 색상 목록 확인
                 console.log("Available colors:", colors);
 
                 return (
@@ -397,7 +434,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
                           key={color.id}
                           onClick={() => {
                             const values = new Set(field.value || []);
-                            // 클릭 시 어떤 값이 추가/제거되는지 확인
                             console.log("Clicked color:", color.id);
                             if (values.has(color.id)) {
                               values.delete(color.id);
@@ -409,7 +445,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             field.onChange(newValues);
                           }}
                           className={`
-                flex items-center gap-2 p-2 rounded-md cursor-pointer border
+                flex items-center justify-center gap-2 p-2 rounded-md cursor-pointer border
                 ${
                   field.value?.includes(color.id)
                     ? "border-black"
@@ -421,7 +457,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             className="w-4 h-4 rounded-full border"
                             style={{ backgroundColor: color.value }}
                           />
-                          {color.name}
+                          <span className="text-center">{color.name}</span>
                         </div>
                       ))}
                     </div>

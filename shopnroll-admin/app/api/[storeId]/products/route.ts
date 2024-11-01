@@ -17,6 +17,7 @@ export async function POST(
       colorId,
       productColors,
       sizeId,
+      productSizes,
       images,
       description,
       isFeatured,
@@ -81,6 +82,11 @@ export async function POST(
           },
         },
         sizeId,
+        productSizes: {
+          createMany: {
+            data: productSizes.map((sizeId: string) => ({ sizeId })),
+          },
+        },
         description: description || null,
         images: {
           createMany: {
@@ -124,13 +130,6 @@ export async function GET(
         sizeId,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false,
-        productColors: productColorId
-          ? {
-              some: {
-                colorId: productColorId,
-              },
-            }
-          : undefined,
       },
       include: {
         images: true,
@@ -138,7 +137,16 @@ export async function GET(
         color: true,
         size: true,
         subCategory: true,
-        productColors: true,
+        productColors: {
+          include: {
+            color: true,
+          },
+        },
+        productSizes: {
+          include: {
+            size: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",

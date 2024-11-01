@@ -77,6 +77,7 @@ model Size {
   name      String
   value     String
   products   Product[]  @relation("ProductSize")
+  productSizes ProductSize[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -114,6 +115,7 @@ model Product {
   orderItems OrderItem[]
   subCategoryId String
   subCategory SubCategory @relation("SubCategoryProduct", fields: [subCategoryId], references: [id])
+  productSizes ProductSize[]
   isFeatured Boolean @default(false) // 특별 상품 여부
   isArchived Boolean @default(false) // 품절 여부나 중단 여부
   createdAt DateTime @default(now())
@@ -125,6 +127,18 @@ model Product {
   @@index([sizeId])
   @@index([colorId])
   @@index([subCategoryId])
+}
+model ProductSize {
+  id        String   @id @default(uuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id])
+  sizeId String
+  size Size @relation(fields: [sizeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([sizeId])
 }
 model ProductColor {
   id        String   @id @default(uuid())
