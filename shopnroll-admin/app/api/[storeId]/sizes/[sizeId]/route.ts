@@ -33,7 +33,8 @@ export async function PATCH(
     const body = await req.json();
 
     const { name, value } = body;
-
+    console.log("Request params:", params);
+    console.log("Request body:", body);
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -61,7 +62,7 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    const size = await prismadb.size.updateMany({
+    const size = await prismadb.size.update({
       where: {
         id: params.sizeId,
       },
@@ -72,10 +73,18 @@ export async function PATCH(
     });
 
     return NextResponse.json(size);
-  } catch (error) {
-    console.log("[SIZE_PATCH]", error);
+  } catch (error: any) {
+    // 자세한 에러 로깅
+    console.log("[SIZE_PATCH] Detailed error:", {
+      message: error.message,
+      stack: error.stack,
+    });
+    
+    return new NextResponse(
+      JSON.stringify({ error: error.message }), 
+      { status: 500 }
+    );
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }
 
 export async function DELETE(
