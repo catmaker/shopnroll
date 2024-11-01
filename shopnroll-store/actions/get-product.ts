@@ -4,7 +4,9 @@ const URL = `${process.env.NEXT_PUBLIC_API_URL}/products`;
 
 const getProduct = async (id: string): Promise<Product> => {
   const res = await fetch(`${URL}/${id}`);
-  return res.json();
+  const data = await res.json();
+  console.log("Product data from API:", data);
+  return data;
 };
 
 export default getProduct;

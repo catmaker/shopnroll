@@ -20,7 +20,9 @@ const getProducts = async (query: Query): Promise<Product[]> => {
     },
   });
   // console.log("Final URL:", url);
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    next: { revalidate: 0 },
+  });
   const data = await res.json();
   // console.log("API Response:", data);
   return data;
