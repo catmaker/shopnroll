@@ -90,6 +90,7 @@ model Color {
   name      String
   value     String
   products   Product[]  @relation("ProductColor")
+  productColors ProductColor[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -109,6 +110,7 @@ model Product {
   size Size @relation("ProductSize", fields: [sizeId], references: [id])
   colorId String
   color Color @relation("ProductColor", fields: [colorId], references: [id])
+  productColors ProductColor[]
   orderItems OrderItem[]
   subCategoryId String
   subCategory SubCategory @relation("SubCategoryProduct", fields: [subCategoryId], references: [id])
@@ -124,7 +126,18 @@ model Product {
   @@index([colorId])
   @@index([subCategoryId])
 }
-  
+model ProductColor {
+  id        String   @id @default(uuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id])
+  colorId String
+  color Color @relation(fields: [colorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([colorId])
+}
 model Image {
   id        String   @id @default(uuid())
   productId String
