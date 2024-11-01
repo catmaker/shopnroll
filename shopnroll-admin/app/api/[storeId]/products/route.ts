@@ -15,6 +15,7 @@ export async function POST(
       categoryId,
       subCategoryId,
       colorId,
+      productColors,
       sizeId,
       images,
       description,
@@ -72,6 +73,13 @@ export async function POST(
         categoryId,
         subCategoryId,
         colorId,
+        productColors: {
+          createMany: {
+            data: productColors.map((colorId: string) => ({
+              colorId,
+            })),
+          },
+        },
         sizeId,
         description: description || null,
         images: {
@@ -102,6 +110,7 @@ export async function GET(
     const colorId = searchParams.get("colorId") || undefined;
     const sizeId = searchParams.get("sizeId") || undefined;
     const isFeatured = searchParams.get("isFeatured");
+    const productColorId = searchParams.get("productColorId") || undefined;
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -115,6 +124,13 @@ export async function GET(
         sizeId,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false,
+        productColors: productColorId
+          ? {
+              some: {
+                colorId: productColorId,
+              },
+            }
+          : undefined,
       },
       include: {
         images: true,
@@ -122,6 +138,7 @@ export async function GET(
         color: true,
         size: true,
         subCategory: true,
+        productColors: true,
       },
       orderBy: {
         createdAt: "desc",

@@ -20,6 +20,7 @@ export async function GET(
         category: true,
         color: true,
         size: true,
+        productColors: true,
       },
     });
 
@@ -43,6 +44,7 @@ export async function PATCH(
       price,
       categoryId,
       colorId,
+      productColors,
       sizeId,
       images,
       description,
@@ -104,6 +106,9 @@ export async function PATCH(
         colorId,
         sizeId,
         description,
+        productColors: {
+          deleteMany: {},
+        },
         images: {
           deleteMany: {},
         },
@@ -120,6 +125,11 @@ export async function PATCH(
         images: {
           createMany: {
             data: [...images.map((image: { url: string }) => image)],
+          },
+        },
+        productColors: {
+          createMany: {
+            data: [...productColors.map((colorId: string) => ({ colorId }))],
           },
         },
       },

@@ -7,6 +7,7 @@ import {
   Size,
   Color,
   SubCategory,
+  ProductColor,
 } from "@prisma/client";
 import Heading from "@/components/ui/heading";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ const formSchema = z.object({
   categoryId: z.string().min(1),
   subCategoryId: z.string().min(1),
   colorId: z.string().min(1),
+  productColors: z.array(z.string()).default([]),
   sizeId: z.string().min(1),
   description: z.string().optional().default(""),
   isFeatured: z.boolean().default(false),
@@ -60,6 +62,7 @@ interface ProductFormProps {
   initialData:
     | (Product & {
         images: Image[];
+        productColors: ProductColor[];
       })
     | null;
   categories: Category[];
@@ -84,7 +87,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const description = initialData ? "Edit a Product" : "Add a new Product";
   const toastMessage = initialData ? "Product updated" : "Product created";
   const action = initialData ? "Save changes" : "Create";
-
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
@@ -92,6 +94,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           ...initialData,
           price: parseFloat(String(initialData.price)),
           description: initialData.description || undefined,
+          productColors: initialData.productColors?.map((pc) => pc.colorId),
         }
       : {
           name: "",
@@ -100,6 +103,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           categoryId: "",
           subCategoryId: "",
           colorId: "",
+          productColors: [],
           sizeId: "",
           description: "",
           isFeatured: false,
@@ -346,7 +350,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               name="colorId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Color</FormLabel>
+                  <FormLabel>Main Color</FormLabel>
                   <Select
                     disabled={loading}
                     onValueChange={field.onChange}
@@ -355,22 +359,75 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue
-                          placeholder="Select a color"
-                          defaultValue={field.value}
-                        />
+                        <SelectValue placeholder="Select a main color" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {colors.map((color) => (
                         <SelectItem key={color.id} value={color.id}>
-                          {color.name}
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: color.value }}
+                            />
+                            {color.name}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </FormItem>
               )}
+            />
+            <FormField
+              control={form.control}
+              name="productColors"
+              render={({ field }) => {
+                // 현재 선택된 색상들의 값을 확인
+                console.log("Selected colors:", field.value);
+                // 사용 가능한 전체 색상 목록 확인
+                console.log("Available colors:", colors);
+
+                return (
+                  <FormItem>
+                    <FormLabel>Additional Colors (Optional)</FormLabel>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {colors.map((color) => (
+                        <div
+                          key={color.id}
+                          onClick={() => {
+                            const values = new Set(field.value || []);
+                            // 클릭 시 어떤 값이 추가/제거되는지 확인
+                            console.log("Clicked color:", color.id);
+                            if (values.has(color.id)) {
+                              values.delete(color.id);
+                            } else {
+                              values.add(color.id);
+                            }
+                            const newValues = Array.from(values);
+                            console.log("New selected colors:", newValues);
+                            field.onChange(newValues);
+                          }}
+                          className={`
+                flex items-center gap-2 p-2 rounded-md cursor-pointer border
+                ${
+                  field.value?.includes(color.id)
+                    ? "border-black"
+                    : "border-gray-200"
+                }
+              `}
+                        >
+                          <div
+                            className="w-4 h-4 rounded-full border"
+                            style={{ backgroundColor: color.value }}
+                          />
+                          {color.name}
+                        </div>
+                      ))}
+                    </div>
+                  </FormItem>
+                );
+              }}
             />
 
             <FormField
