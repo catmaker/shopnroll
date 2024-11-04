@@ -60,3 +60,10 @@ export interface Color {
   name: string;
   value: string;
 }
+
+export type WishlistItem = {
+  product: Product;
+  selectedColor?: string | null;
+  selectedSize?: string | null;
+  quantity?: number;
+};
