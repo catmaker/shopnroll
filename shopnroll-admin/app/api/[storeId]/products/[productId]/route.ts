@@ -18,6 +18,7 @@ export async function GET(
       include: {
         images: true,
         category: true,
+        subCategory: true,
         color: true,
         size: true,
         productColors: {

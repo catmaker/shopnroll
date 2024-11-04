@@ -15,7 +15,7 @@ const BrowseCategories = ({ title, data }: BrowseCategoriesProps) => {
         {data.map((item) => (
           <Link
             key={item.id}
-            href={`/category/${item.id}`}
+            href={`/category/${item.categoryId}?subCategoryId=${item.id}`}
             className="p-4 border rounded-md text-center"
           >
             {item.name}
