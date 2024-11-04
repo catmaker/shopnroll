@@ -4,22 +4,28 @@ import React, { MouseEventHandler } from "react";
 import { Product, SubCategory as SubCategoryType } from "@/lib/types";
 import Image from "next/image";
 import IconButton from "@/components/ui/icon-button";
-import { Expand, ShoppingCart } from "lucide-react";
+import { Expand, ShoppingCart, Heart, X } from "lucide-react";
 import Currency from "@/components/ui/currency";
 import SubCategory from "@/components/ui/sub-category";
 import { useRouter } from "next/navigation";
 import usePreviewModal from "@/hooks/use-preview-modal";
+import useWishlist from "@/hooks/use-wishlist";
+import { usePathname } from "next/navigation";
 
 interface ProductCardProps {
   product: Product;
   subCategories: SubCategoryType[];
 }
 const ProductCard = ({ product, subCategories }: ProductCardProps) => {
-  console.log(subCategories, "subCategories");
-  console.log(product, "product");
-
+  const pathname = usePathname();
+  const wishlist = useWishlist();
+  const isWishlisted = wishlist.items.some(
+    (item) => item.product.id === product.id
+  );
+  const items = wishlist.items;
   const router = useRouter();
   const previewModal = usePreviewModal();
+  const isWishlistPage = pathname === "/wishlist";
   const handleClick = () => {
     router.push(`/product/${product.id}`);
   };
@@ -43,6 +49,17 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
           fill
           className="aspect-square object-cover rounded-md"
         />
+        {isWishlisted && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              wishlist.removeItem(product.id);
+            }}
+            className="absolute right-2 top-2 z-10 bg-white rounded-full p-2 shadow-md hover:scale-110 transition"
+          >
+            <X size={20} className="text-gray-600" />
+          </button>
+        )}
         <div className="opacity-0 group-hover:opacity-100 transition absolute w-full px-6 bottom-5">
           <div className="flex gap-x-6 justify-center">
             <IconButton
@@ -52,6 +69,30 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
             <IconButton
               icon={<ShoppingCart size={20} className="text-gray-600" />}
             />
+            <IconButton
+              icon={
+                <Heart
+                  size={20}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    isWishlisted
+                      ? wishlist.removeItem(product.id)
+                      : wishlist.addItem({
+                          product,
+                          quantity: 1,
+                        });
+                  }}
+                  className={`
+                    transition-all duration-300 ease-in-out
+                    ${
+                      isWishlisted
+                        ? "text-red-500 fill-red-500"
+                        : "fill-none text-gray-600 hover:text-red-500"
+                    }
+                `}
+                />
+              }
+            />
           </div>
         </div>
       </div>
@@ -60,6 +101,27 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
         <p className="text-sm mt-2">
           {subCategory && <SubCategory subCategory={subCategory} />}
         </p>
+        {isWishlistPage && (
+          <div className="flex flex-col gap-2 mt-4">
+            {items
+              .filter((item) => item.product.id === product.id)
+              .map((item) => (
+                <div
+                  key={item.product.id}
+                  className="text-sm text-gray-500 flex flex-col"
+                >
+                  {item.selectedColor && (
+                    <span className="mr-2">Color: {item.selectedColor}</span>
+                  )}
+                  {item.selectedSize && (
+                    <span className="mr-2">Size: {item.selectedSize}</span>
+                  )}
+                  {(item.selectedColor || item.selectedSize) &&
+                    item.quantity && <span>Quantity: {item.quantity}</span>}
+                </div>
+              ))}
+          </div>
+        )}
         <div className="flex items-center justify-between mt-4 ">
           <Currency value={product?.price} />
         </div>

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Product } from "@/lib/types";
 import Currency from "@/components/ui/currency";
 import Button from "@/components/ui/button";
+import ProductActions from "@/components/product-actions";
 
 interface InfoProps {
   product: Product;
@@ -138,12 +139,12 @@ const Info = ({ product }: InfoProps) => {
       )}
 
       <div className="mt-4 flex items-center gap-2 justify-between">
-        <Button className="bg-gray-800 text-white px-4 py-2 rounded-md hover:scale-105 transition min-w-[180px]">
-          Buy it now
-        </Button>
-        <Button className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition min-w-[120px]">
-          Wishlist
-        </Button>
+        <ProductActions
+          product={product}
+          selectedColor={selectedColor}
+          selectedSize={selectedSize}
+          quantity={quantity}
+        />
       </div>
     </div>
   );
