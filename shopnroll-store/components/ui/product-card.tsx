@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { MouseEventHandler } from "react";
 import { Product, SubCategory as SubCategoryType } from "@/lib/types";
 import Image from "next/image";
 import IconButton from "@/components/ui/icon-button";
@@ -8,14 +8,18 @@ import { Expand, ShoppingCart } from "lucide-react";
 import Currency from "@/components/ui/currency";
 import SubCategory from "@/components/ui/sub-category";
 import { useRouter } from "next/navigation";
+import usePreviewModal from "@/hooks/use-preview-modal";
 
 interface ProductCardProps {
   product: Product;
   subCategories: SubCategoryType[];
 }
 const ProductCard = ({ product, subCategories }: ProductCardProps) => {
-  const router = useRouter();
+  console.log(subCategories, "subCategories");
+  console.log(product, "product");
 
+  const router = useRouter();
+  const previewModal = usePreviewModal();
   const handleClick = () => {
     router.push(`/product/${product.id}`);
   };
@@ -23,6 +27,10 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
     (subCategory) => subCategory.id === product.subCategory.id
   );
 
+  const onPreview: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.stopPropagation();
+    previewModal.onOpen(product);
+  };
   return (
     <div
       onClick={handleClick}
@@ -37,7 +45,10 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
         />
         <div className="opacity-0 group-hover:opacity-100 transition absolute w-full px-6 bottom-5">
           <div className="flex gap-x-6 justify-center">
-            <IconButton icon={<Expand size={20} className="text-gray-600" />} />
+            <IconButton
+              onClick={onPreview}
+              icon={<Expand size={20} className="text-gray-600" />}
+            />
             <IconButton
               icon={<ShoppingCart size={20} className="text-gray-600" />}
             />
@@ -46,9 +57,11 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
       </div>
       <div className="relative p-2 flex flex-col justify-between">
         <p className="font-semibold text-lg">{product.name}</p>
-        <div className="flex items-center justify-between mt-4">
-          <Currency value={product?.price} />
+        <p className="text-sm mt-2">
           {subCategory && <SubCategory subCategory={subCategory} />}
+        </p>
+        <div className="flex items-center justify-between mt-4 ">
+          <Currency value={product?.price} />
         </div>
       </div>
     </div>

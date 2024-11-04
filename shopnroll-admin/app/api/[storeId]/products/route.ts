@@ -115,6 +115,7 @@ export async function GET(
     const categoryId = searchParams.get("categoryId") || undefined;
     const colorId = searchParams.get("colorId") || undefined;
     const sizeId = searchParams.get("sizeId") || undefined;
+    const subCategoryId = searchParams.get("subCategoryId") || undefined;
     const isFeatured = searchParams.get("isFeatured");
     const productColorId = searchParams.get("productColorId") || undefined;
 
@@ -130,6 +131,7 @@ export async function GET(
         sizeId,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false,
+        subCategoryId,
       },
       include: {
         images: true,
@@ -156,6 +158,6 @@ export async function GET(
     return NextResponse.json(products);
   } catch (error) {
     console.log("[PRODUCT_GET]", error);
+    return NextResponse.json("Internal error", { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }

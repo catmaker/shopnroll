@@ -10,6 +10,7 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
+import Link from "next/link";
 
 interface MainNavProps {
   categories: Category[];
@@ -23,7 +24,7 @@ const MainNav = ({ categories, subCategories }: MainNavProps) => {
     href: `/category/${route.id}`,
     label: route.name,
     id: route.id,
-    active: pathname === `/category/${route.id}`,
+    active: pathname.startsWith(`/category/${route.id}`),
   }));
 
   return (
@@ -31,7 +32,8 @@ const MainNav = ({ categories, subCategories }: MainNavProps) => {
       <NavigationMenuList>
         {routes.map((route) => (
           <NavigationMenuItem key={route.href} className="relative group/item">
-            <div
+            <Link
+              href={route.href}
               className={cn(
                 "inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:text-black bg-transparent",
                 route.active ? "text-black" : "text-neutral-500"
@@ -42,17 +44,18 @@ const MainNav = ({ categories, subCategories }: MainNavProps) => {
                 className="relative top-[1px] ml-1 h-3 w-3 transition duration-300 group-hover/item:rotate-180"
                 aria-hidden="true"
               />
-            </div>
+            </Link>
             <ul className="hidden group-hover/item:block absolute top-full left-0 w-max p-2 bg-white rounded-md shadow-md">
               {subCategories
                 .filter((sub) => sub.categoryId === route.id)
                 .map((subCategory) => (
-                  <li
+                  <Link
+                    href={`/category/${route.id}?subCategoryId=${subCategory.id}`}
                     key={subCategory.id}
-                    className="p-2 hover:bg-neutral-100 rounded-sm"
+                    className="p-2 hover:bg-neutral-100 rounded-sm flex flex-col gap-y-1"
                   >
-                    {subCategory.name}
-                  </li>
+                    <p className="text-sm">{subCategory.name}</p>
+                  </Link>
                 ))}
             </ul>
           </NavigationMenuItem>
