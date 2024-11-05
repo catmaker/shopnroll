@@ -5,10 +5,12 @@ import { ShoppingCart, Heart } from "lucide-react";
 import Button from "@/components/ui/button";
 import useWishlist from "@/hooks/use-wishlist";
 import { useRouter } from "next/navigation";
+import useCart from "@/hooks/use-cart";
 
 const NavActions = () => {
   const [isMounted, setIsMounted] = useState(false);
   const wishlist = useWishlist();
+  const cart = useCart();
   const router = useRouter();
   useEffect(() => {
     setIsMounted(true);
@@ -32,8 +34,8 @@ const NavActions = () => {
           <span className="text-sm font-medium">{wishlist.items.length}</span>
         </div>
         <div className="flex items-center">
-          <ShoppingCart strokeWidth={2} />
-          <span className="ml-1 text-sm font-medium">0</span>
+          <ShoppingCart strokeWidth={2} onClick={() => router.push("/cart")} />
+          <span className="ml-1 text-sm font-medium">{cart.items.length}</span>
         </div>
       </Button>
     </div>

@@ -11,24 +11,32 @@ import { useRouter } from "next/navigation";
 import usePreviewModal from "@/hooks/use-preview-modal";
 import useWishlist from "@/hooks/use-wishlist";
 import { usePathname } from "next/navigation";
+import useCart from "@/hooks/use-cart";
 
 interface ProductCardProps {
   product: Product;
   subCategories: SubCategoryType[];
 }
+
 const ProductCard = ({ product, subCategories }: ProductCardProps) => {
   const pathname = usePathname();
   const wishlist = useWishlist();
+  const cart = useCart();
   const isWishlisted = wishlist.items.some(
     (item) => item.product.id === product.id
   );
-  const items = wishlist.items;
+  const isCarted = cart.items.some((item) => item.product.id === product.id);
+  const wishlistItems = wishlist.items;
+  const cartItems = cart.items;
   const router = useRouter();
   const previewModal = usePreviewModal();
   const isWishlistPage = pathname === "/wishlist";
+  const isCartPage = pathname === "/cart";
+
   const handleClick = () => {
     router.push(`/product/${product.id}`);
   };
+
   const subCategory = subCategories.find(
     (subCategory) => subCategory.id === product.subCategory.id
   );
@@ -37,6 +45,7 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
     event.stopPropagation();
     previewModal.onOpen(product);
   };
+
   return (
     <div
       onClick={handleClick}
@@ -67,7 +76,28 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
               icon={<Expand size={20} className="text-gray-600" />}
             />
             <IconButton
-              icon={<ShoppingCart size={20} className="text-gray-600" />}
+              icon={
+                <ShoppingCart
+                  size={20}
+                  className={`
+                    transition-all duration-300 ease-in-out
+                    ${
+                      isCarted
+                        ? "text-blue-500 fill-blue-500"
+                        : "fill-none text-gray-600 hover:text-blue-500"
+                    }
+                  `}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    isCarted
+                      ? cart.removeItem(product.id)
+                      : cart.addItem({
+                          product,
+                          addedAt: Date.now(),
+                        });
+                  }}
+                />
+              }
             />
             <IconButton
               icon={
@@ -89,7 +119,7 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
                         ? "text-red-500 fill-red-500"
                         : "fill-none text-gray-600 hover:text-red-500"
                     }
-                `}
+                  `}
                 />
               }
             />
@@ -101,9 +131,11 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
         <p className="text-sm mt-2">
           {subCategory && <SubCategory subCategory={subCategory} />}
         </p>
+
+        {/* 위시리스트 페이지일 때 */}
         {isWishlistPage && (
           <div className="flex flex-col gap-2 mt-4">
-            {items
+            {wishlistItems
               .filter((item) => item.product.id === product.id)
               .map((item) => (
                 <div
@@ -116,13 +148,35 @@ const ProductCard = ({ product, subCategories }: ProductCardProps) => {
                   {item.selectedSize && (
                     <span className="mr-2">Size: {item.selectedSize}</span>
                   )}
-                  {(item.selectedColor || item.selectedSize) &&
-                    item.quantity && <span>Quantity: {item.quantity}</span>}
+                  {item.quantity && <span>Quantity: {item.quantity}</span>}
                 </div>
               ))}
           </div>
         )}
-        <div className="flex items-center justify-between mt-4 ">
+
+        {/* 카트 페이지일 때 */}
+        {isCartPage && (
+          <div className="flex flex-col gap-2 mt-4">
+            {cartItems
+              .filter((item) => item.product.id === product.id)
+              .map((item) => (
+                <div
+                  key={item.product.id}
+                  className="text-sm text-gray-500 flex flex-col"
+                >
+                  {item.selectedColor && (
+                    <span className="mr-2">Color: {item.selectedColor}</span>
+                  )}
+                  {item.selectedSize && (
+                    <span className="mr-2">Size: {item.selectedSize}</span>
+                  )}
+                  {item.quantity && <span>Quantity: {item.quantity}</span>}
+                </div>
+              ))}
+          </div>
+        )}
+
+        <div className="flex items-center justify-between mt-4">
           <Currency value={product?.price} />
         </div>
       </div>

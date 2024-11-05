@@ -2,8 +2,11 @@
 
 import Button from "@/components/ui/button";
 import useWishlist from "@/hooks/use-wishlist";
+import useCart from "@/hooks/use-cart";
 import { Product } from "@/lib/types";
 import { Heart } from "lucide-react";
+import { useRouter } from "next/navigation";
+import usePreviewModal from "@/hooks/use-preview-modal";
 
 interface ProductActionsProps {
   product: Product;
@@ -19,6 +22,9 @@ const ProductActions = ({
   quantity = 1,
 }: ProductActionsProps) => {
   const wishlist = useWishlist();
+  const cart = useCart();
+  const router = useRouter();
+  const previewModal = usePreviewModal();
   const isWishlisted = wishlist.items.some(
     (item) => item.product.id === product.id
   );
@@ -37,21 +43,22 @@ const ProductActions = ({
   };
 
   const onBuyNow = () => {
-    // 구매 로직 구현
-    console.log("Buy now:", {
+    cart.addItem({
       product,
       selectedColor,
       selectedSize,
       quantity,
+      addedAt: Date.now(),
     });
+    previewModal.onClose();
+    router.push("/cart");
   };
 
   return (
     <div className="mt-4 flex items-center gap-2 justify-between">
       <Button
         onClick={onBuyNow}
-        disabled={!selectedColor || !selectedSize}
-        className="bg-gray-800 text-white px-4 py-2 rounded-md hover:scale-105 transition min-w-[180px]"
+        className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 hover:shadow-lg transition min-w-[180px]"
       >
         Buy it now
       </Button>
