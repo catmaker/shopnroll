@@ -27,6 +27,11 @@ const MainNav = ({
       active: pathname === `/${params.storeId}/categories`,
     },
     {
+      href: `/${params.storeId}/subcategories`,
+      label: "SubCategories",
+      active: pathname === `/${params.storeId}/subcategories`,
+    },
+    {
       href: `/${params.storeId}/sizes`,
       label: "Sizes",
       active: pathname === `/${params.storeId}/sizes`,
@@ -36,10 +41,16 @@ const MainNav = ({
       label: "Colors",
       active: pathname === `/${params.storeId}/colors`,
     },
+
     {
       href: `/${params.storeId}/products`,
       label: "Products",
       active: pathname === `/${params.storeId}/products`,
+    },
+    {
+      href: `/${params.storeId}/productcolors`,
+      label: "ProductColors",
+      active: pathname === `/${params.storeId}/productcolors`,
     },
     {
       href: `/${params.storeId}/orders`,

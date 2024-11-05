@@ -53,9 +53,10 @@ const SizeForm = ({ initialData }: SizeFormProps) => {
   const onSubmit = async (data: SizeFormValues) => {
     try {
       setLoading(true);
+
       if (initialData) {
         await axios.patch(
-          `/api/${params.storeId}/sizes/${params.sizesId}`,
+          `/api/${params.storeId}/sizes/${params.sizeId}`,
           data
         );
       } else {

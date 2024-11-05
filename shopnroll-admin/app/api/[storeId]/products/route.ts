@@ -8,14 +8,18 @@ export async function POST(
   try {
     const { userId } = auth();
     const body = await req.json();
-
+    console.log(body);
     const {
       name,
       price,
       categoryId,
+      subCategoryId,
       colorId,
+      productColors,
       sizeId,
+      productSizes,
       images,
+      description,
       isFeatured,
       isArchived,
     } = body;
@@ -68,8 +72,22 @@ export async function POST(
         name,
         price,
         categoryId,
+        subCategoryId,
         colorId,
+        productColors: {
+          createMany: {
+            data: productColors.map((colorId: string) => ({
+              colorId,
+            })),
+          },
+        },
         sizeId,
+        productSizes: {
+          createMany: {
+            data: productSizes.map((sizeId: string) => ({ sizeId })),
+          },
+        },
+        description: description || null,
         images: {
           createMany: {
             data: [...images.map((image: { url: string }) => image)],
@@ -83,9 +101,9 @@ export async function POST(
 
     return NextResponse.json(product);
   } catch (error) {
-    console.log("[PRODUCT_PATCH]", error);
+    console.log("[PRODUCT_POST]", error);
+    return new NextResponse(`Internal error: ${error}`, { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }
 
 export async function GET(
@@ -97,7 +115,9 @@ export async function GET(
     const categoryId = searchParams.get("categoryId") || undefined;
     const colorId = searchParams.get("colorId") || undefined;
     const sizeId = searchParams.get("sizeId") || undefined;
+    const subCategoryId = searchParams.get("subCategoryId") || undefined;
     const isFeatured = searchParams.get("isFeatured");
+    const productColorId = searchParams.get("productColorId") || undefined;
 
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
@@ -111,12 +131,24 @@ export async function GET(
         sizeId,
         isFeatured: isFeatured ? true : undefined,
         isArchived: false,
+        subCategoryId,
       },
       include: {
         images: true,
         category: true,
         color: true,
         size: true,
+        subCategory: true,
+        productColors: {
+          include: {
+            color: true,
+          },
+        },
+        productSizes: {
+          include: {
+            size: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -126,6 +158,6 @@ export async function GET(
     return NextResponse.json(products);
   } catch (error) {
     console.log("[PRODUCT_GET]", error);
+    return NextResponse.json("Internal error", { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }

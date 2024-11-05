@@ -1,6 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Product, Image, Category, Size, Color } from "@prisma/client";
+import {
+  Product,
+  Image,
+  Category,
+  Size,
+  Color,
+  SubCategory,
+  ProductColor,
+  ProductSize,
+} from "@prisma/client";
 import Heading from "@/components/ui/heading";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -34,8 +43,12 @@ const formSchema = z.object({
   name: z.string().min(1),
   price: z.coerce.number().min(1),
   categoryId: z.string().min(1),
+  subCategoryId: z.string().min(1),
   colorId: z.string().min(1),
+  productColors: z.array(z.string()).default([]),
+  productSizes: z.array(z.string()).default([]),
   sizeId: z.string().min(1),
+  description: z.string().optional().default(""),
   isFeatured: z.boolean().default(false),
   isArchived: z.boolean().default(false),
   images: z
@@ -51,11 +64,14 @@ interface ProductFormProps {
   initialData:
     | (Product & {
         images: Image[];
+        productColors: ProductColor[];
+        productSizes: ProductSize[];
       })
     | null;
   categories: Category[];
   sizes: Size[];
   colors: Color[];
+  subCategories: SubCategory[];
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
@@ -63,6 +79,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   categories,
   sizes,
   colors,
+  subCategories,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -73,29 +90,43 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const description = initialData ? "Edit a Product" : "Add a new Product";
   const toastMessage = initialData ? "Product updated" : "Product created";
   const action = initialData ? "Save changes" : "Create";
-
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
       ? {
           ...initialData,
           price: parseFloat(String(initialData.price)),
+          description: initialData.description || undefined,
+          productColors: initialData.productColors?.map((pc) => pc.colorId),
+          productSizes: initialData.productSizes?.map((ps) => ps.sizeId),
         }
       : {
           name: "",
           images: [],
           price: 0,
           categoryId: "",
+          subCategoryId: "",
           colorId: "",
+          productColors: [],
+          productSizes: [],
           sizeId: "",
+          description: "",
           isFeatured: false,
           isArchived: false,
         },
   });
+
+  const selectedCategoryId = form.watch("categoryId");
+
+  const filteredSubCategories = subCategories.filter(
+    (subCategory) => subCategory.categoryId === selectedCategoryId
+  );
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "images",
   });
+
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
@@ -116,6 +147,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setLoading(false);
     }
   };
+
   const onDelete = async () => {
     try {
       setLoading(true);
@@ -132,6 +164,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setOpen(false);
     }
   };
+
   return (
     <>
       <AlertModal
@@ -196,6 +229,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="price"
@@ -249,6 +283,43 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
             <FormField
               control={form.control}
+              name="subCategoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sub Category</FormLabel>
+                  <Select
+                    disabled={loading || !form.watch("categoryId")}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            filteredSubCategories.length > 0
+                              ? "Select a sub category"
+                              : "No sub categories found"
+                          }
+                          defaultValue={field.value}
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {filteredSubCategories.map((subCategory) => (
+                        <SelectItem key={subCategory.id} value={subCategory.id}>
+                          {subCategory.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="sizeId"
               render={({ field }) => (
                 <FormItem>
@@ -278,13 +349,47 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={form.control}
+              name="productSizes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Additional Sizes (Optional)</FormLabel>
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                    {sizes.map((size) => (
+                      <div
+                        key={size.id}
+                        onClick={() => {
+                          const values = new Set(field.value || []);
+                          if (values.has(size.id)) {
+                            values.delete(size.id);
+                          } else {
+                            values.add(size.id);
+                          }
+                          field.onChange(Array.from(values));
+                        }}
+                        className={`
+              flex items-center justify-center p-2 rounded-md cursor-pointer border
+              ${
+                field.value?.includes(size.id)
+                  ? "border-black"
+                  : "border-gray-200"
+              }
+            `}
+                      >
+                        <span className="text-center">{size.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="colorId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Color</FormLabel>
+                  <FormLabel>Main Color</FormLabel>
                   <Select
                     disabled={loading}
                     onValueChange={field.onChange}
@@ -293,20 +398,88 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue
-                          placeholder="Select a color"
-                          defaultValue={field.value}
-                        />
+                        <SelectValue placeholder="Select a main color" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {colors.map((color) => (
                         <SelectItem key={color.id} value={color.id}>
-                          {color.name}
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: color.value }}
+                            />
+                            {color.name}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="productColors"
+              render={({ field }) => {
+                console.log("Selected colors:", field.value);
+                console.log("Available colors:", colors);
+
+                return (
+                  <FormItem>
+                    <FormLabel>Additional Colors (Optional)</FormLabel>
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {colors.map((color) => (
+                        <div
+                          key={color.id}
+                          onClick={() => {
+                            const values = new Set(field.value || []);
+                            console.log("Clicked color:", color.id);
+                            if (values.has(color.id)) {
+                              values.delete(color.id);
+                            } else {
+                              values.add(color.id);
+                            }
+                            const newValues = Array.from(values);
+                            console.log("New selected colors:", newValues);
+                            field.onChange(newValues);
+                          }}
+                          className={`
+                flex items-center justify-center gap-2 p-2 rounded-md cursor-pointer border
+                ${
+                  field.value?.includes(color.id)
+                    ? "border-black"
+                    : "border-gray-200"
+                }
+              `}
+                        >
+                          <div
+                            className="w-4 h-4 rounded-full border"
+                            style={{ backgroundColor: color.value }}
+                          />
+                          <span className="text-center">{color.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </FormItem>
+                );
+              }}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Product description"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />

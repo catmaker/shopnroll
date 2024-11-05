@@ -18,16 +18,27 @@ export async function GET(
       include: {
         images: true,
         category: true,
+        subCategory: true,
         color: true,
         size: true,
+        productColors: {
+          include: {
+            color: true,
+          },
+        },
+        productSizes: {
+          include: {
+            size: true,
+          },
+        },
       },
     });
 
     return NextResponse.json(product);
   } catch (error) {
     console.log("[PRODUCT_GET]", error);
+    return NextResponse.json("Internal error", { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }
 
 export async function PATCH(
@@ -43,8 +54,11 @@ export async function PATCH(
       price,
       categoryId,
       colorId,
+      productColors,
       sizeId,
+      productSizes,
       images,
+      description,
       isFeatured,
       isArchived,
     } = body;
@@ -102,6 +116,13 @@ export async function PATCH(
         categoryId,
         colorId,
         sizeId,
+        productSizes: {
+          deleteMany: {},
+        },
+        description,
+        productColors: {
+          deleteMany: {},
+        },
         images: {
           deleteMany: {},
         },
@@ -120,14 +141,24 @@ export async function PATCH(
             data: [...images.map((image: { url: string }) => image)],
           },
         },
+        productColors: {
+          createMany: {
+            data: [...productColors.map((colorId: string) => ({ colorId }))],
+          },
+        },
+        productSizes: {
+          createMany: {
+            data: [...productSizes.map((sizeId: string) => ({ sizeId }))],
+          },
+        },
       },
     });
 
     return NextResponse.json(product);
   } catch (error) {
     console.log("[PRODUCT_PATCH]", error);
+    return new NextResponse(`Internal error: ${error}`, { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }
 
 export async function DELETE(
@@ -165,6 +196,6 @@ export async function DELETE(
     return NextResponse.json(product);
   } catch (error) {
     console.log("[PRODUCT_DELETE]", error);
+    return new NextResponse(`Internal error: ${error}`, { status: 500 });
   }
-  return NextResponse.json("Internal error", { status: 500 });
 }
