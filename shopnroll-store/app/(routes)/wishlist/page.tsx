@@ -6,7 +6,7 @@ const WishlistPage = () => {
   return (
     <div className="bg-white">
       <Container>
-        <div className="px-4 py-10 sm:px-6 lg:px-8 mt-12 max-w-7xl mx-auto">
+        <div className="px-4 py-10 sm:px-6 lg:px-8 mt-8 max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Wishlist</h1>
             <p className="text-sm text-gray-500">

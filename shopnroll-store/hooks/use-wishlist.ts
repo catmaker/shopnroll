@@ -1,14 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Product } from "@/lib/types";
-
-interface WishlistItem {
-  product: Product;
-  selectedColor?: string | null;
-  selectedSize?: string | null;
-  quantity: number;
-  addedAt: number;
-}
+import { Product, WishlistItem } from "@/lib/types";
 
 interface WishlistStore {
   items: WishlistItem[];

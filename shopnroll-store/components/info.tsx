@@ -9,13 +9,6 @@ interface InfoProps {
   product: Product;
 }
 
-interface SelectedItem {
-  id: string;
-  color: string;
-  size: string;
-  quantity: number;
-}
-
 const Info = ({ product }: InfoProps) => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -42,7 +35,7 @@ const Info = ({ product }: InfoProps) => {
         </span>
         <Currency
           value={product.price}
-          className="text-xl text-black font-thin text-[#3f3f3f]"
+          className="text-xl text-black font-thin"
         />
       </div>
 
