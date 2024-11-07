@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     const body = await req.json(); // 요청 본문 파싱
 
     const { name, billboardId } = body;

@@ -10,7 +10,7 @@ interface SettingsPageProps {
 }
 
 const SettingsPage = async ({ params }: SettingsPageProps) => {
-  const { userId } = auth();
+  const { userId }: { userId: string | null } = await auth();
   if (!userId) {
     redirect("/sign-in");
   }

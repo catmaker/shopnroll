@@ -29,7 +29,7 @@ export async function PATCH(
   { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     const body = await req.json();
 
     const { name, value } = body;
@@ -79,11 +79,10 @@ export async function PATCH(
       message: error.message,
       stack: error.stack,
     });
-    
-    return new NextResponse(
-      JSON.stringify({ error: error.message }), 
-      { status: 500 }
-    );
+
+    return new NextResponse(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
   }
 }
 
@@ -92,7 +91,7 @@ export async function DELETE(
   { params }: { params: { storeId: string; sizeId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });

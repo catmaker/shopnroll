@@ -24,13 +24,12 @@ export async function GET(
   return NextResponse.json("Internal error", { status: 500 });
 }
 
-
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { storeId: string; billboardId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     const body = await req.json();
 
     const { label, imageUrl } = body;
@@ -84,7 +83,7 @@ export async function DELETE(
   { params }: { params: { storeId: string; billboardId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -100,7 +99,7 @@ export async function DELETE(
         userId,
       },
     });
-    
+
     if (!storeByUserId) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
@@ -110,7 +109,7 @@ export async function DELETE(
         id: params.billboardId,
       },
     });
-    
+
     return NextResponse.json(billboard);
   } catch (error) {
     console.log("[BILLBOARD_DELETE]", error);

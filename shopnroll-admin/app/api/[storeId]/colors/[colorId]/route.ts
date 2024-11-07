@@ -29,7 +29,7 @@ export async function PATCH(
   { params }: { params: { storeId: string; colorId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     const body = await req.json();
 
     const { name, value } = body;
@@ -83,7 +83,7 @@ export async function DELETE(
   { params }: { params: { storeId: string; colorId: string } }
 ) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });

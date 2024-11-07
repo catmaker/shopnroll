@@ -6,7 +6,7 @@ import StoreSwitcher from "@/components/store-switcher";
 import { redirect } from "next/navigation";
 import prismadb from "@/lib/prismadb";
 const Nav = async () => {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) {
     redirect("/sign-in");
   }
