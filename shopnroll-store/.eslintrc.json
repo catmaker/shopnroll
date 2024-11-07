@@ -1,8 +1,8 @@
 {
   "extends": "next/core-web-vitals",
   "rules": {
-    "indent": ["error", 2],
-    "import/newline-after-import": ["error", { "count": 1 }],
+    "indent": ["warn", 2],
+    "import/newline-after-import": ["warn", { "count": 1 }],
     "padding-line-between-statements": [
       "error",
       { "blankLine": "always", "prev": "function", "next": "function" }
