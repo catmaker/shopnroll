@@ -7,11 +7,26 @@ import Link from "next/link";
 import usePreviewModal from "@/hooks/use-preview-modal";
 import Button from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 const CartSummary = () => {
   const { items: cartItems } = useCart();
   const router = useRouter();
   const { isOpen, onOpen, onClose } = usePreviewModal();
+  const searchParams = useSearchParams();
+  const { removeAll } = useCart();
+
+  useEffect(() => {
+    if (searchParams.get("success")) {
+      toast.success("Payment completed.");
+    }
+    if (searchParams.get("canceled")) {
+      toast.error("Something went wrong.");
+    }
+  }, [searchParams, removeAll]);
 
   if (cartItems?.length === 0) {
     return null;
@@ -20,6 +35,24 @@ const CartSummary = () => {
   const allItemsSelected = cartItems.every(
     (item) => item.selectedColor && item.selectedSize
   );
+
+  const onCheckout = async () => {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/checkout`,
+      {
+        items: cartItems.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity || 1,
+          selectedColor: item.selectedColor,
+          selectedSize: item.selectedSize,
+        })),
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    window.location.href = res.data.url;
+  };
 
   return (
     <div className="mt-4">
@@ -139,9 +172,7 @@ const CartSummary = () => {
               }
               text-white
             `}
-            onClick={() => {
-              router.push("/checkout");
-            }}
+            onClick={onCheckout}
             disabled={!allItemsSelected}
           >
             {allItemsSelected ? "Checkout" : "Select All Options"}

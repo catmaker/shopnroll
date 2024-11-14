@@ -1,4 +1,4 @@
-import BillboardClient from "./components/client";
+import OrderClient from "./components/client";
 import prismadb from "@/lib/prismadb";
 import { OrderColumn } from "./components/columns";
 import { format } from "date-fns";
@@ -25,6 +25,8 @@ const OrdersPage = async ({ params }: { params: { storeId: string } }) => {
     id: item.id,
     phone: item.phone,
     address: item.address,
+    name: item.name,
+    email: item.email,
     products: item.orderItems
       .map((orderItem) => orderItem.product.name)
       .join(", "),
@@ -38,10 +40,11 @@ const OrdersPage = async ({ params }: { params: { storeId: string } }) => {
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
   }));
 
+  console.log(formmattedOrders);
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <BillboardClient data={formmattedOrders} />
+        <OrderClient data={formmattedOrders} />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import React from "react";
 import prismadb from "@/lib/prismadb";
+import DashboardClient from "./components/client";
 
 interface DashboardPageProps {
   params: { storeId: string };
@@ -10,7 +11,17 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
       id: params.storeId,
     },
   });
-  return <div>Active Store: {store?.name}</div>;
+
+  const totalRevenue = await prismadb.order.aggregate({
+    where: {
+      storeId: params.storeId,
+      isPaid: true,
+    },
+    _sum: {
+      totalPrice: true,
+    },
+  });
+  return <DashboardClient totalRevenue={totalRevenue} />;
 };
 
 export default DashboardPage;

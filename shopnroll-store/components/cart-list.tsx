@@ -1,14 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import NoResults from "@/components/ui/no-results";
 import ProductCard from "@/components/ui/product-card";
 import useCart from "@/hooks/use-cart";
 import Button from "@/components/ui/button";
+import { toast } from "react-hot-toast";
 
 const CartList = () => {
-  const { items, removeAll } = useCart();
-  console.log(items);
+  const { items, removeItem, removeAll } = useCart();
+  const searchParams = useSearchParams();
+  
+  useEffect(() => {
+    if (searchParams.get("success")) {
+      // 현재 장바구니에 있는 아이템들의 ID를 저장
+      const currentItemIds = items.map(item => item.product.id);
+      
+      // 각 아이템 제거
+      currentItemIds.forEach(id => removeItem(id));
+      
+      toast.success("결제가 완료되었습니다.");
+    }
+  }, [searchParams, removeItem, items]);
+
   return (
     <>
       <div className="mt-12">
