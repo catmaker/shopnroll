@@ -39,7 +39,6 @@ const ColorForm = ({ initialData }: ColorFormProps) => {
   const [open, setOpen] = useState(false);
   const params = useParams();
   const router = useRouter();
-  console.log(params);
 
   const title = initialData ? "Edit Color" : "Create Color";
   const description = initialData ? "Edit a color" : "Add a new color";

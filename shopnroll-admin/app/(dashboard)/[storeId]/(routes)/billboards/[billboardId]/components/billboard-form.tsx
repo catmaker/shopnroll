@@ -21,6 +21,7 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import AlertModal from "@/components/modals/alert-modal";
 import ImageUpload from "@/components/ui/image-upload";
+
 const formSchema = z.object({
   label: z.string().min(1),
   imageUrl: z.string().min(1),
@@ -71,6 +72,7 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
       setLoading(false);
     }
   };
+
   const onDelete = async () => {
     try {
       setLoading(true);

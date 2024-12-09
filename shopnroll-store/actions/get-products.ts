@@ -10,7 +10,6 @@ interface Query {
   subCategoryId?: string;
 }
 const getProducts = async (query: Query): Promise<Product[]> => {
-  // console.log("Original query:", query);
   const url = qs.stringifyUrl({
     url: URL,
     query: {
@@ -21,12 +20,11 @@ const getProducts = async (query: Query): Promise<Product[]> => {
       subCategoryId: query.subCategoryId,
     },
   });
-  // console.log("Final URL:", url);
   const res = await fetch(url, {
     next: { revalidate: 0 },
   });
   const data = await res.json();
-  // console.log("API Response:", data);
+  console.log("Products data from API:", data);
   return data;
 };
 

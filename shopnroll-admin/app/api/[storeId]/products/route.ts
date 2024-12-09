@@ -8,7 +8,6 @@ export async function POST(
   try {
     const { userId } = await auth();
     const body = await req.json();
-    console.log(body);
     const {
       name,
       price,
