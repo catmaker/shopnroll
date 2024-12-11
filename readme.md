@@ -2,6 +2,15 @@
 
 ShopNRoll은 Next.js를 기반으로 한 현대적인 이커머스 플랫폼입니다. 관리자 대시보드와 사용자 스토어로 구성되어 있습니다.
 
+## 데모 영상
+
+### 관리자 페이지 데모
+[![관리자 페이지 데모 영상](https://img.youtube.com/vi/g8vYV1WreHM/maxresdefault.jpg)](https://youtu.be/g8vYV1WreHM)
+
+### 스토어 페이지 데모
+[![스토어 페이지 데모 영상](https://img.youtube.com/vi/qA-UMHkbBus/maxresdefault.jpg)](https://youtu.be/qA-UMHkbBus)
+
+
 ## 프로젝트 구조
 
 ### 전체 구조
